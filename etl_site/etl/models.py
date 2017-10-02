@@ -14,7 +14,7 @@ class User(AbstractUser):
     date_registered = models.DateTimeField()
 
 class Table(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     table_name = models.CharField(max_length=144)
     date_created = models.DateTimeField(auto_now_add=True)
     db_server = models.CharField(max_length=144)
