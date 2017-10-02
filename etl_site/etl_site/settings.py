@@ -37,10 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'elt_site.etl',
+    'etl',
 ]
 
-AUTH_USER_MODEL = 'elt.User'
+AUTH_USER_MODEL = 'etl.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
