@@ -11,7 +11,7 @@ class User(AbstractUser):
     occupation = models.CharField(max_length=50)
     industry = models.CharField(max_length=50)
     company = models.CharField(max_length=50)
-    date_registered = models.DateTimeField()
+    date_registered = models.DateTimeField(blank=True, null=True)
 
 class Table(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -19,4 +19,4 @@ class Table(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     db_server = models.CharField(max_length=144)
     reference_sheet = models.CharField(max_length=144)
-    last_modefied = models.DateTimeField(auto_now=True)
+    last_modified = models.DateTimeField(auto_now=True)
