@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'etl',
+    'etl_site.etl',
 ]
 
 AUTH_USER_MODEL = 'etl.User'

@@ -7,10 +7,12 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class User(AbstractUser):
     ip = models.CharField(max_length=39)
-    status = models.CharField(max_length=10)
-    occupation = models.CharField(max_length=50)
-    industry = models.CharField(max_length=50)
-    company = models.CharField(max_length=50)
+    status = models.CharField(max_length=10, blank=True)
+    occupation = models.CharField(max_length=30, blank=True)
+    industry = models.CharField(max_length=30, blank=True)
+    company = models.CharField(max_length=30, blank=True)
+    location = models.CharField(max_length=30, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
     date_registered = models.DateTimeField(blank=True, null=True)
 
 class Table(models.Model):
