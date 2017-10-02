@@ -5,4 +5,4 @@ from django.apps import AppConfig
 
 
 class EtlConfig(AppConfig):
-    name = 'ETL'
+    name = 'etl'
