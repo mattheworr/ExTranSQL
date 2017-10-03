@@ -16,10 +16,10 @@ class User(AbstractUser):
     date_registered = models.DateTimeField(blank=True, null=True)
 
 class Table(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey('etl.User', on_delete=models.CASCADE)
     table_name = models.CharField(max_length=144)
     date_created = models.DateTimeField(auto_now_add=True)
-    db_server = models.ForeignKey(DBServer, on_delete=models.CASCADE)
+    db_server = models.ForeignKey('etl.DBServer', on_delete=models.CASCADE)
     reference_sheet = models.CharField(max_length=144)
     last_modified = models.DateTimeField(auto_now=True)
 
@@ -27,3 +27,9 @@ class DBServer(models.Model):
     host = models.CharField(max_length=144)
     username = models.CharField(max_length=144)
     password = models.CharField(max_length=144)
+    
+    class Meta:
+        verbose_name = 'DBServer'
+
+    def __unicode__(self):
+        return "%s" % self.host
