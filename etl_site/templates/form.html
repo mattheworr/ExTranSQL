@@ -4,13 +4,17 @@
 
 <h1>ExTranSQL</h1>
 
-<form action="/action_page.php">
-    Email: <input type="text" name="email" value="Enter email">
+<form action='/process' method='post' enctype='multipart/form-data'>
+	{% csrf_token %}
+	<label for='email'>Email:</label>
+    <input id='email' type='text' name='email' value='Enter email' required>
     <br><br>
-    File: <input type="file" name="table" accept=".csv, .xls, .xlsx">
+    <label for='raw_file'>File:</label>
+    <input id='raw_file' type='file' name='raw_file' accept='.csv, .xls, .xlsx' required>
     <p><i>*Select a .csv, .xls or .xlsx file to upload.</i></p>
-    <input type="submit" value="Submit">
+	<input type='submit' value='Submit'>
 </form> 
+
 
 </body>
 </html>

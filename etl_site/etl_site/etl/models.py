@@ -22,6 +22,7 @@ class Table(models.Model):
     db_server = models.ForeignKey('etl.DBServer', on_delete=models.CASCADE)
     reference_sheet = models.CharField(max_length=144)
     last_modified = models.DateTimeField(auto_now=True)
+    raw_file = models.FileField()
 
 class DBServer(models.Model):
     host = models.CharField(max_length=144)

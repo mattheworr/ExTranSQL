@@ -18,4 +18,5 @@ from etl import views as etl_views
 
 urlpatterns = [
     url(r'^$', etl_views.form),
+    url(r'^process', etl_views.process),
 ]
