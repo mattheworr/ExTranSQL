@@ -62,8 +62,8 @@ class sql_table():
 			self.get_formatted_variables() + ');')
 
 	def get_variable_list(self):
-		return ('(\"' + 
-			'\", \"'.join(self.get_variables()) + '\")')
+		return ('(' + 
+			', '.join(self.get_variables()) + ')')
 
 	def get_value_list(self, row):
 		return ('(\"' + 
