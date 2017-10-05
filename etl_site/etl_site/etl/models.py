@@ -6,22 +6,22 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-    ip = models.CharField(max_length=39)
-    status = models.CharField(max_length=10, blank=True)
-    occupation = models.CharField(max_length=30, blank=True)
-    industry = models.CharField(max_length=30, blank=True)
-    company = models.CharField(max_length=30, blank=True)
-    location = models.CharField(max_length=30, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
+    ip = models.CharField(max_length=39, null=True)
+    status = models.CharField(max_length=10, blank=True, null=True)
+    occupation = models.CharField(max_length=30, blank=True, null=True)
+    industry = models.CharField(max_length=30, blank=True, null=True)
+    company = models.CharField(max_length=30, blank=True, null=True)
+    location = models.CharField(max_length=30, blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True)
     date_registered = models.DateTimeField(blank=True, null=True)
 
 class Table(models.Model):
-    user = models.ForeignKey('etl.User', on_delete=models.CASCADE)
-    table_name = models.CharField(max_length=144)
+    user = models.ForeignKey('etl.User', on_delete=models.CASCADE, blank=True, null=True)
+    table_name = models.CharField(max_length=144, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    db_server = models.ForeignKey('etl.DBServer', on_delete=models.CASCADE)
-    reference_sheet = models.CharField(max_length=144)
-    last_modified = models.DateTimeField(auto_now=True)
+    db_server = models.ForeignKey('etl.DBServer', on_delete=models.CASCADE, blank=True, null=True)
+    reference_sheet = models.CharField(max_length=144, blank=True, null=True)
+    last_modified = models.DateTimeField(auto_now=True, blank=True, null=True)
     raw_file = models.FileField()
 
 class DBServer(models.Model):

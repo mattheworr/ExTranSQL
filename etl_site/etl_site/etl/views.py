@@ -5,13 +5,16 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 from .forms import FileForm
+from .models import Table as table_model
 
 # Create your views here.
 def form(request):
     if request.method == 'POST':
-		form = FileForm(request.POST)
+		form = FileForm(request.POST, request.FILES)
 		if form.is_valid():
-			return HttpResponseRedirect('/success/')
+			table_instance = table_model(raw_file=request.FILES['raw_file'])
+			table_instance.save()
+			return HttpResponseRedirect('/success')
     else:
 		form = FileForm()
 
@@ -20,8 +23,8 @@ def form(request):
     	{'form': form}
     )
 
-def process(request):
+def success(request):
     return render(
-    	request,
-    	'success.html'
+		request,
+		'success.html'
     )
