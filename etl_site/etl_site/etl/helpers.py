@@ -2,9 +2,9 @@ import csv
 
 class sql_table():
 	variables = []
-	obervations = []
-	table_name = None
+	observations = []
 	dataframe = None
+	table_name = None
 
 	def set_table_name(self, name):
 		self.table_name = name
@@ -15,21 +15,27 @@ class sql_table():
 	def set_variable_type(self, variable, data_type):
 		self.variables.append({variable: data_type})
 
-	def get_variables_types(self):
+	def get_variables_w_types(self):
 		return self.variables
 
 	def get_variables(self):
-		return list(self.variables.keys())
+	    names = []
+	    for pair in self.variables:
+	        names.append(pair.keys()[0])
+	    return names
 
 	def get_types(self):
-		return list(self.variables.values())
+	    values = []
+	    for pair in self.variables:
+	        values.append(pair.values()[0])
+	    return values
 
 	def set_row(self, row):
-		self.observations.append(dict(zip(get_names_only(), row)))
+		self.observations.append(dict(zip(get_variables(), row)))
 
-	def set_all_rows(self, rows)
-		for row in self.add_raw_data(csv_file):
-			self.add_row(row)
+	def set_all_rows(self, rows):
+		for row in self.get_dataframe():
+			self.set_row(row)
 
 	def set_dataframe(self, csv_file):
 		with open(csv_file) as data:
@@ -42,30 +48,30 @@ class sql_table():
 	def get_dataframe(self):
 		return self.dataframe
 
-	def gat_formatted_variables(self):
+	def get_formatted_variables(self):
 		formatted = ''
-		for item in self.get_variables()
-			for key, value in item:
-				pair = ', ' + str(k) + str(v)
+		for item in self.get_variables_w_types():
+			for key, value in item.iteritems():
+				pair = ', ' + str(key) + ' ' + str(value)
 				formatted += pair
 		return formatted
 
 	def get_create_script(self):
-		return 'CREATE TABLE ' + 
+		return ('CREATE TABLE ' + 
 			self.get_table_name() + ' (id INT' + 
-			self.get_formatted_variables() + ');'
+			self.get_formatted_variables() + ');')
 
 	def get_variable_list(self):
-		return '(' + 
-			', '.join(self.get_variables()) + ')'
+		return ('(\"' + 
+			'\", \"'.join(self.get_variables()) + '\")')
 
 	def get_value_list(self, row):
-		return '(' + 
-			', '.join(row) + ')'
+		return ('(\"' + 
+			'\", \"'.join(row) + '\")')
 
 	def generate_insert_script(self):
 		for row in self.get_dataframe():
-			yield insert_queries.append('INSERT INTO ' + 
+			yield ('INSERT INTO ' + 
 				self.get_table_name() + 
 				self.get_variable_list() + ' VALUES ' + 
 				self.get_value_list(row) + ';')
@@ -73,6 +79,19 @@ class sql_table():
 	def get_insert_script(self):
 		for script in self.generate_insert_script():
 			return script
+
+	def export_txt(self):
+		with open('111aaa.txt','w') as file:
+			file.write(self.get_create_script())
+			file.write('\n')
+			for script in self.generate_insert_script():
+				file.write(script)
+				file.write('\n')
+
+'''
+["tripduration","starttime","stoptime","start station id","start station name","start station latitude","start station longitude","end station id","end station name","end station latitude","end station longitude","bikeid","usertype","birth year","gender"]
+["INT","TIMESTAMP","TIMESTAMP","VARCHAR(5)","VARCHAR(100)","FLOAT","FLOAT","VARCHAR(5)","VARCHAR(100)","FLOAT","FLOAT","VARCHAR(6)","VARCHAR(20)","DATE","BOOLEAN"]
+'''
 
 '''
 CREATE TABLE table_name (
