@@ -1,5 +1,5 @@
 import csv
-from MySQL import connect, escape_string
+from MySQLdb import connect, escape_string
 
 class sql_table():
 	variables = []
