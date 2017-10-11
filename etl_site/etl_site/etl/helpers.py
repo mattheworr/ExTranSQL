@@ -1,6 +1,6 @@
 import csv
 from MySQLdb import connect, escape_string
-import json
+from django.http import JsonResponse
 
 class sql_table():
 	variables = []
@@ -15,7 +15,6 @@ class sql_table():
 	head = []
 
 	def __init__(self, model_object):
-		#defines basic params
 		self.model_object = model_object
 		self.set_ref_id(self.model_object.get_id())
 		self.set_table_name(self.model_object.get_filename())
@@ -23,9 +22,12 @@ class sql_table():
 		self.set_head()
 
 	def get_json(self):
-		#preps json for view
-		return json.dumps({'table-name': True, 
-			'data': [d for d in self.get_head()]})
+		row_id = 1
+		data = []
+		for col, val in self.get_head().iteritems():
+			data.append({'id': row_id, 'name': col, 'text': '<br>'.join(val)})
+			row_id += 1
+		return {'table_name': table_name, 'data': data}
 
 	def set_head(self):
 		for name in self.get_default_header():
@@ -38,13 +40,13 @@ class sql_table():
 		return self.head	
 
 	def set_ref_id(self, id_num):
-		self.validate_ref_id()
+		#self.validate_ref_id()
 		self.ref_id = id_num
-
+	'''
 	def validate_ref_id(self):
 		if self.get_ref_id != None:
 			raise Exception('ID already exists')
-
+	'''
 	def get_ref_id(self):
 		return self.ref_id
 
@@ -98,19 +100,22 @@ class sql_table():
 			self.set_row(row)
 
 	def get_header(self, data):
-		return csv.Sniffer().has_header(data.read(1024))
+		return csv.Sniffer().has_header(data)
 
 	def get_rows(self, data):
 		return csv.reader(data)
 
 	def set_dataframe(self, csv_file):
-		with open(csv_file) as data:
-			rows = self.get_rows(data)
-			self.set_shape(rows, rows[0])
-			if self.get_header(data) == True:
-				self.set_custom_header(rows[0])
-				next(rows, None)
-			self.dataframe = list(rows)
+		csv_file.open(mode='r')
+		data = csv_file.readlines()
+		csv_file.close()
+		rows = list(self.get_rows(data))[:-1]
+		print rows
+		self.set_shape(rows, rows[0])
+		if self.get_header(data) == True:
+			self.set_custom_header(rows[0])
+			next(rows, None)
+		self.dataframe = list(rows)
 
 	def set_shape(self, rows, columns):
 		self.shape = (len(rows), len(columns))

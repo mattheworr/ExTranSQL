@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+</head>
+
+<body>
+
+<h1>ExTranSQL</h1>
+
+<form action='/' method='post' enctype='multipart/form-data'>
+  {% csrf_token %}
+  <label for='table_name'>Table Name:</label>
+  <input id='table_name' type='text' name='table_name' v-bind:value='value' required>
+  <div id='data_form'>
+    <todo-item
+      v-for="item in formList"
+      v-bind:section="item"
+      v-bind:key="item.id">
+    </todo-item>
+</div>
+  <input type='submit' value='Generate SQL'>
+</form> 
+
+</body>
+
+<script>
+
+$.ajax({
+  url: '/ajax/create-table/',
+  type: 'GET',
+  dataType: 'json',
+}).done(function( data ) {
+    alert( "Data Saved: " + data.table_name );
+});
+/*
+new Vue({
+  el: '#table_name',
+  data: {
+    value: data.table_name
+  }
+})
+
+Vue.component('todo-item', {
+  props: ['section'],
+  template: "<div><input class='column_name' type='text' name='column_name' \
+    v-bind:value='section.name' required><input class='datatype' type='text' \
+    name='datatype' value='ENTER DATATYPE' required>{{ section.text }}</div>"
+})
+var data_form = new Vue({
+  el: '#data_form',
+  data: {
+    formList: data.data
+  }
+})
+*/
+
+</script>
+
+</html>
