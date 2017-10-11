@@ -24,6 +24,15 @@ class Table(models.Model):
     last_modified = models.DateTimeField(auto_now=True, blank=True, null=True)
     raw_file = models.FileField()
 
+    def get_id(self):
+        return self.id
+
+    def get_raw_file(self):
+        return self.raw_file
+
+    def get_filename(self):
+        return os.path.basename(self.raw_file.name)
+
 class DBServer(models.Model):
     host = models.CharField(max_length=144)
     username = models.CharField(max_length=144)

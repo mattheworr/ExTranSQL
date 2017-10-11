@@ -1,5 +1,6 @@
 import csv
 from MySQLdb import connect, escape_string
+import json
 
 class sql_table():
 	variables = []
@@ -9,6 +10,43 @@ class sql_table():
 	dataframe = None
 	table_name = None
 	connected = False
+	ref_id = None
+	model_object = None
+	head = []
+
+	def __init__(self, model_object):
+		#defines basic params
+		self.model_object = model_object
+		self.set_ref_id(self.model_object.get_id())
+		self.set_table_name(self.model_object.get_filename())
+		self.set_dataframe(self.model_object.get_raw_file())
+		self.set_head()
+
+	def get_json(self):
+		#preps json for view
+		return json.dumps({'table-name': True, 
+			'data': [d for d in self.get_head()]})
+
+	def set_head(self):
+		for name in self.get_default_header():
+			self.head.append({name: []})
+		for row in self.get_dataframe()[:5]:
+			for i,col in enumerate(row):
+				self.head[i].values().append(col)
+
+	def get_head(self):
+		return self.head	
+
+	def set_ref_id(self, id_num):
+		self.validate_ref_id()
+		self.ref_id = id_num
+
+	def validate_ref_id(self):
+		if self.get_ref_id != None:
+			raise Exception('ID already exists')
+
+	def get_ref_id(self):
+		return self.ref_id
 
 	def set_table_name(self, name):
 		self.table_name = name
@@ -29,7 +67,8 @@ class sql_table():
 		return self.default_header
 
 	def set_variable_type(self, variable, data_type):
-		self.variables.append({variable: data_type})
+		self.variables.append(
+			{self.clean_column_name(variable): self.clean_datatype(data_type)})
 
 	def get_variables_w_types(self):
 		return self.variables
@@ -165,12 +204,14 @@ class sql_table():
 		return escape_string(string)
 
 	def clean_column_name(self, string):
-		pass
+		return self.escape_string(
+			self.replace_spaces(
+			self.truncate_string(string, 128)))
 
 	def clean_datatype(self, string):
 		pass
 
-	def clean_data(self, string):
+	def clean_data(self, string, datatype, dtparams):
 		pass
 
 	def validate_column_name(self, string):
@@ -179,6 +220,18 @@ class sql_table():
 	def validate_datatype(self, string):
 		pass
 
+	def get_query(self, string):
+		pass
+
+	def validate_query(self, string):
+		pass
+
+	def get_response(self, string):
+		pass
+
+	def translate_table_name(self, string):
+		pass
+		#self.get_ref_id()
 
 '''
 ["tripduration","starttime","stoptime","start station id","start station name","start station latitude","start station longitude","end station id","end station name","end station latitude","end station longitude","bikeid","usertype","birth year","gender"]
@@ -188,11 +241,11 @@ class sql_table():
 '''
 CREATE TABLE table_name (
 	id INT,
+	variable0 data_type0,
 	variable1 data_type1,
-	variable2 data_type2,
-	variable3 data_type3
+	variable2 data_type2
 );
 
-INSERT INTO table_name (variable1, variable2, variable3) 
-VALUES ('value1', 'value2', 'value3');
+INSERT INTO table_name (variable0, variable1, variable2) 
+VALUES ('value0', 'value1', 'value2');
 '''

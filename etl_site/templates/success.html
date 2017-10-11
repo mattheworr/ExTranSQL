@@ -1,10 +1,48 @@
 <!DOCTYPE html>
 <html>
+<script src="https://unpkg.com/vue"></script>
 <body>
 
 <h1>ExTranSQL</h1>
 
-<h2>SUCCESS!!!</h2>
+<form action='/' method='post' enctype='multipart/form-data'>
+	{% csrf_token %}
+	<label for='table_name'>Table Name:</label>
+	<input id='table_name' type='text' name='table_name' v-bind:value='value' required>
+	<div id='data_form'>
+    <todo-item
+      v-for="item in formList"
+      v-bind:section="item"
+      v-bind:key="item.id">
+    </todo-item>
+</div>
+	<input type='submit' value='Submit'>
+</form> 
 
 </body>
+
+<script>
+new Vue({
+  el: '#table_name',
+  data: {
+    value: 'default_name'
+  }
+})
+
+Vue.component('todo-item', {
+  props: ['section'],
+  template: "<div><input class='column_name' type='text' name='column_name' v-bind:value='section.name' required><input class='datatype' type='text' name='datatype' value='ENTER DATATYPE' required>{{ section.text }}</div>"
+})
+var data_form = new Vue({
+  el: '#data_form',
+  data: {
+    formList: [
+      { id: 1, name: 'col1', text: 'value1, value2, value3' },
+      { id: 2, name: 'col2', text: 'value1, value2, value3' },
+      { id: 3, name: 'col3', text: 'value1, value2, value3' }
+    ]
+  }
+})
+</script>
+
 </html>
