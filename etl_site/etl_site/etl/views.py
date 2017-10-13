@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 
 from .forms import FileForm
 from .models import Table as table_model
@@ -27,7 +28,6 @@ def form(request):
 def create_table(request):
 	active_id = request.session.get('active_instance')
 	sql_table = sql(table_model.objects.get(id=active_id))
-	sql_table.save()
 	return JsonResponse(sql_table.get_json())
 
 def manage_table(request):
