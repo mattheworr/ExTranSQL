@@ -1,6 +1,7 @@
 import csv
 from MySQLdb import connect, escape_string
 from django.http import JsonResponse
+import codecs
 
 class sql_table():
 	variables = []
@@ -100,22 +101,22 @@ class sql_table():
 			self.set_row(row)
 
 	def get_header(self, data):
-		return csv.Sniffer().has_header(data)
+		return csv.Sniffer().has_header(
+			codecs.EncodedFile(data, 'utf-8').read(1024))
 
 	def get_rows(self, data):
 		return csv.reader(data)
 
 	def set_dataframe(self, csv_file):
-		csv_file.open(mode='r')
-		data = csv_file.readlines()
-		csv_file.close()
-		rows = list(self.get_rows(data))[:-1]
-		print rows
+		csv_file.open()
+		data = csv_file
+		rows = list(self.get_rows(data))
 		self.set_shape(rows, rows[0])
 		if self.get_header(data) == True:
 			self.set_custom_header(rows[0])
 			next(rows, None)
 		self.dataframe = list(rows)
+		csv_file.close()
 
 	def set_shape(self, rows, columns):
 		self.shape = (len(rows), len(columns))
