@@ -36,8 +36,8 @@ def manage_table(request):
 	if request.method == 'POST':
 		dumps(loads(request.session.get('sql_table')).get_sql(
 			request.POST['table_name'], 
-			request.POST['column_name'], 
-			request.POST['datatype']))
+			request.POST.getlist('column_name'), 
+			request.POST.getlist('datatype')))
 		return HttpResponseRedirect('/download/')
 
 	return render(request,

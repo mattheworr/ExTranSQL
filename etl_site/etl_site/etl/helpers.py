@@ -240,7 +240,7 @@ class sql_table():
 			self.truncate_string(string, 128)))
 
 	def clean_datatype(self, string):
-		pass
+		return string
 
 	def clean_data(self, string, datatype, dtparams):
 		pass
