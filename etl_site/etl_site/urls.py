@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^ajax/create-table/$', etl_views.create_table),
     url(r'^manage-table/$', etl_views.manage_table),
     url(r'^download/$', etl_views.download),
+    url(r'^ajax/get-sql/$', etl_views.get_sql_file),
 ]

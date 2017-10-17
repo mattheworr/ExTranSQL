@@ -23,6 +23,8 @@ class Table(models.Model):
     reference_sheet = models.CharField(max_length=144, blank=True, null=True)
     last_modified = models.DateTimeField(auto_now=True, blank=True, null=True)
     raw_file = models.FileField()
+    export_file = models.FileField()
+
 
     def get_id(self):
         return self.id
@@ -32,6 +34,12 @@ class Table(models.Model):
 
     def get_filename(self):
         return os.path.basename(self.raw_file.name)
+
+    def set_export_file(self, name, query):
+        self.export_file.save(name, query)
+
+    def get_export_file(self):
+        return self.export_file
 
 class DBServer(models.Model):
     host = models.CharField(max_length=144)

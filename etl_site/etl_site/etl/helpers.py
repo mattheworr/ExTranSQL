@@ -1,7 +1,10 @@
 import csv
 from MySQLdb import connect, escape_string
 from django.http import JsonResponse
+from .models import Table as table_model
+from django.core.files.base import ContentFile
 import codecs
+import os
 
 class sql_table():
 	variables = []
@@ -22,20 +25,33 @@ class sql_table():
 		self.set_dataframe(self.model_object.get_raw_file())
 		self.set_head()
 
+	def get_model_object(self):
+		return self.model_object
+
 	def get_json(self):
 		row_id = 1
 		data = []
-		for col, val in self.get_head().iteritems():
-			data.append({'id': row_id, 'name': col, 'text': '<br>'.join(val)})
-			row_id += 1
-		return {'table_name': table_name, 'data': data}
+		for head in self.get_head():
+			for col, val in head.iteritems():
+				data.append(
+					{'id': row_id, 'name': col, 'text': '<br>'.join(val)})
+				row_id += 1
+		return {'table_name': self.get_table_name(), 'data': data}
+
+	def get_sql(self, table_name, col_list, datatype_list):
+		self.set_table_name(table_name)
+		for i,e in enumerate(col_list):
+			self.set_variable_type(col_list[i], datatype_list[i])
+		self.export_txt()
 
 	def set_head(self):
 		for name in self.get_default_header():
 			self.head.append({name: []})
+		print self.head
 		for row in self.get_dataframe()[:5]:
 			for i,col in enumerate(row):
-				self.head[i].values().append(col)
+				key = self.head[i].keys()[0]
+				self.head[i][key].append(col)
 
 	def get_head(self):
 		return self.head	
@@ -52,7 +68,7 @@ class sql_table():
 		return self.ref_id
 
 	def set_table_name(self, name):
-		self.table_name = name
+		self.table_name = name.split('.')[0]
 
 	def get_table_name(self):
 		return self.table_name
@@ -65,7 +81,7 @@ class sql_table():
 		self.default_header = header
 
 	def get_default_header(self):
-		if self.default_header != True:
+		if not self.default_header:
 			self.set_default_header()
 		return self.default_header
 
@@ -101,8 +117,7 @@ class sql_table():
 			self.set_row(row)
 
 	def get_header(self, data):
-		return csv.Sniffer().has_header(
-			codecs.EncodedFile(data, 'utf-8').read(1024))
+		return csv.Sniffer().has_header(data)
 
 	def get_rows(self, data):
 		return csv.reader(data)
@@ -111,11 +126,15 @@ class sql_table():
 		csv_file.open()
 		data = csv_file
 		rows = list(self.get_rows(data))
+		string = ''
+		for row in rows[:5]:
+			string += '\"{0}\"'.format('\",\"'.join(row))
 		self.set_shape(rows, rows[0])
-		if self.get_header(data) == True:
+		if self.get_header(string) == True:
 			self.set_custom_header(rows[0])
-			next(rows, None)
-		self.dataframe = list(rows)
+			self.dataframe = rows[1:]
+		else:
+			self.dataframe = rows
 		csv_file.close()
 
 	def set_shape(self, rows, columns):
@@ -163,13 +182,19 @@ class sql_table():
 		for script in self.generate_insert_script():
 			return script
 
+	def get_model(self):
+		if self.model_object is None:
+			self.model_object = table_model.objects.get(self.get_ref_id())
+		return self.model_object
+
 	def export_txt(self):
-		with open('temp.txt','w') as file:
-			file.write(self.get_create_script())
-			file.write('\n')
-			for script in self.generate_insert_script():
-				file.write(script)
-				file.write('\n')
+		file_string = '{0}\n'.format(self.get_create_script())
+		for script in self.generate_insert_script():
+			file_string += '{0}\n'.format(script)
+		model = self.get_model()
+		model.set_export_file('{0}.sql'.format(
+			self.get_table_name()), ContentFile(file_string))
+		model.save()
 
 	def connect_to_db(self):
 		db = connect(
