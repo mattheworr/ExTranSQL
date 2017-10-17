@@ -25,9 +25,6 @@ class sql_table():
 		self.set_dataframe(self.model_object.get_raw_file())
 		self.set_head()
 
-	def get_model_object(self):
-		return self.model_object
-
 	def get_json(self):
 		row_id = 1
 		data = []
@@ -182,7 +179,7 @@ class sql_table():
 		for script in self.generate_insert_script():
 			return script
 
-	def get_model(self):
+	def get_model_object(self):
 		if self.model_object is None:
 			self.model_object = table_model.objects.get(self.get_ref_id())
 		return self.model_object
@@ -191,7 +188,7 @@ class sql_table():
 		file_string = '{0}\n'.format(self.get_create_script())
 		for script in self.generate_insert_script():
 			file_string += '{0}\n'.format(script)
-		model = self.get_model()
+		model = self.get_model_object()
 		model.set_export_file('{0}.sql'.format(
 			self.get_table_name()), ContentFile(file_string))
 		model.save()
