@@ -37,6 +37,7 @@ class sql_table():
 
 	def get_sql(self, table_name, col_list, datatype_list):
 		self.set_table_name(table_name)
+		self.get_model_object().update_table_name(self.get_table_name())
 		for i,e in enumerate(col_list):
 			self.set_variable_type(col_list[i], datatype_list[i])
 		self.export_txt()
@@ -189,8 +190,7 @@ class sql_table():
 		for script in self.generate_insert_script():
 			file_string += '{0}\n'.format(script)
 		model = self.get_model_object()
-		model.set_export_file('{0}.sql'.format(
-			self.get_table_name()), ContentFile(file_string))
+		model.set_export_file('temp.sql', ContentFile(file_string))
 		model.save()
 
 	def connect_to_db(self):
@@ -260,6 +260,12 @@ class sql_table():
 	def translate_table_name(self, string):
 		pass
 		#self.get_ref_id()
+
+	def export_sql_string(self):
+		file_string = '{0}\n'.format(self.get_create_script())
+		for script in self.generate_insert_script():
+			file_string += '{0}\n'.format(script)
+		return file_string
 
 '''
 ["tripduration","starttime","stoptime","start station id","start station name","start station latitude","start station longitude","end station id","end station name","end station latitude","end station longitude","bikeid","usertype","birth year","gender"]

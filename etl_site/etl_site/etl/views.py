@@ -12,6 +12,7 @@ from .helpers import sql_table as sql
 
 # Create your views here.
 def form(request):
+	request.session.flush()
 	if request.method == 'POST':
 		form = FileForm(request.POST, request.FILES)
 		if form.is_valid():
@@ -34,10 +35,10 @@ def create_table(request):
 
 def manage_table(request):
 	if request.method == 'POST':
-		dumps(loads(request.session.get('sql_table')).get_sql(
+		loads(request.session.get('sql_table')).get_sql(
 			request.POST['table_name'], 
 			request.POST.getlist('column_name'), 
-			request.POST.getlist('datatype')))
+			request.POST.getlist('datatype'))
 		return HttpResponseRedirect('/download/')
 
 	return render(request,
@@ -48,10 +49,10 @@ def download(request):
 		'download.html')
 
 def get_sql_file(request):
-	sql_table = loads(request.session.get('sql_table'))
-	response = HttpResponse(sql_table.get_model_object().get_export_file(), 
-		content_type='text/sql')
+	active_id = request.session.get('active_instance')
+	table_instance = table_model.objects.get(id=active_id)
+	response = HttpResponseRedirect(table_instance.get_export_file())
 	response['Content-Disposition'] = 'attachment; filename={0}.sql'.format(
-		sql_table.get_table_name())
+		table_instance.get_table_name())
 	return response
 

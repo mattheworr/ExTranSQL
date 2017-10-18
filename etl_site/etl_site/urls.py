@@ -18,7 +18,7 @@ from etl import views as etl_views
 from django.contrib import admin
 
 urlpatterns = [
-	url(r'^admin/$', admin.site.urls),
+	url(r'^admin/', admin.site.urls),
     url(r'^$', etl_views.form),
     url(r'^ajax/create-table/$', etl_views.create_table),
     url(r'^manage-table/$', etl_views.manage_table),
