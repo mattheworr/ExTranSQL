@@ -40,7 +40,7 @@ class sql_table():
 		self.get_model_object().update_table_name(self.get_table_name())
 		for i,e in enumerate(col_list):
 			self.set_variable_type(col_list[i], datatype_list[i])
-		self.export_txt()
+		self.set_sql_file()
 
 	def set_head(self):
 		for name in self.get_default_header():
@@ -55,13 +55,15 @@ class sql_table():
 		return self.head	
 
 	def set_ref_id(self, id_num):
-		#self.validate_ref_id()
+		# self.validate_ref_id()
 		self.ref_id = id_num
+
 	'''
 	def validate_ref_id(self):
 		if self.get_ref_id != None:
 			raise Exception('ID already exists')
 	'''
+
 	def get_ref_id(self):
 		return self.ref_id
 
@@ -102,6 +104,7 @@ class sql_table():
 	        values.append(pair.values()[0])
 	    return values
 
+	'''	
 	def set_dict(self, keys, values):
 		return dict(zip(keys, values))
 
@@ -113,6 +116,7 @@ class sql_table():
 	def set_all_rows(self, rows):
 		for row in self.get_dataframe():
 			self.set_row(row)
+	'''
 
 	def get_header(self, data):
 		return csv.Sniffer().has_header(data)
@@ -185,14 +189,18 @@ class sql_table():
 			self.model_object = table_model.objects.get(self.get_ref_id())
 		return self.model_object
 
-	def export_txt(self):
-		file_string = '{0}\n'.format(self.get_create_script())
-		for script in self.generate_insert_script():
-			file_string += '{0}\n'.format(script)
+	def set_sql_file(self):
 		model = self.get_model_object()
-		model.set_export_file('temp.sql', ContentFile(file_string))
+		model.set_export_file('temp.sql', ContentFile(self.get_sql_string()))
 		model.save()
 
+	def get_sql_string(self):
+		sql_string = '{0}\n'.format(self.get_create_script())
+		for script in self.generate_insert_script():
+			sql_string += '{0}\n'.format(script)
+		return sql_string
+
+	'''
 	def connect_to_db(self):
 		db = connect(
 			host='dev.matthewjorr.com', 
@@ -221,6 +229,7 @@ class sql_table():
 		self.post_to_db(self.get_create_script())
 		for script in self.generate_insert_script():
 			self.post_to_db(script)
+	'''
 
 	def replace_spaces(self, string):
 		return string.replace(' ', '_')
@@ -237,8 +246,10 @@ class sql_table():
 			self.truncate_string(string, 128)))
 
 	def clean_datatype(self, string):
+		# Coming soon
 		return string
 
+	'''
 	def clean_data(self, string, datatype, dtparams):
 		pass
 
@@ -260,12 +271,9 @@ class sql_table():
 	def translate_table_name(self, string):
 		pass
 		#self.get_ref_id()
+	'''
 
-	def export_sql_string(self):
-		file_string = '{0}\n'.format(self.get_create_script())
-		for script in self.generate_insert_script():
-			file_string += '{0}\n'.format(script)
-		return file_string
+	
 
 '''
 ["tripduration","starttime","stoptime","start station id","start station name","start station latitude","start station longitude","end station id","end station name","end station latitude","end station longitude","bikeid","usertype","birth year","gender"]

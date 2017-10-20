@@ -45,8 +45,11 @@ def manage_table(request):
 		'manage-table.html')
 
 def download(request):
+	active_id = request.session.get('active_instance')
+	table_instance = table_model.objects.get(id=active_id)
 	return render(request,
-		'download.html')
+		'download.html',
+		{'download_url': table_instance.get_export_file()})
 
 def get_sql_file(request):
 	active_id = request.session.get('active_instance')
