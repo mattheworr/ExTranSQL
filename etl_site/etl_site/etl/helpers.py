@@ -49,7 +49,6 @@ class sql_table():
 	def _set_head(self):
 		for name in self._get_default_header():
 			self.head.append({name: []})
-		print self.head
 		for row in self._get_dataframe()[:5]:
 			for i,col in enumerate(row):
 				key = self.head[i].keys()[0]
@@ -79,7 +78,7 @@ class sql_table():
 
 	def _set_default_header(self):
 		for col in range(self.get_shape()[1]):
-			self.default_header.append('column_{0}'.format(col))
+			self.default_header.append('column_{!s}'.format(col))
 
 	def _set_custom_header(self, header):
 		self.default_header = header
@@ -91,23 +90,17 @@ class sql_table():
 
 	def _set_variable_type(self, variable, data_type):
 		self.variables.append(
-			{self._clean_column_name(
-                variable): self._clean_datatype(data_type)})
+			{self._sanitize_column_name(
+                variable): self._sanitize_datatype(data_type)})
 
 	def _get_variables_w_types(self):
 		return self.variables
 
 	def _get_variables(self):
-		names = []
-		for pair in self.variables:
-			names.append(pair.keys()[0])
-		return names
+		return [pair.keys()[0] for pair in self.variables]
 
 	def _get_types(self):
-		values = []
-		for pair in self.variables:
-			values.append(pair.values()[0])
-		return values
+		return [pair.values()[0] for pair in self.variables]
 
 	'''	
 	def set_dict(self, keys, values):
@@ -135,7 +128,7 @@ class sql_table():
 		rows = list(self._get_rows(data))
 		string = ''
 		for row in rows[:5]:
-			string += '\"{0}\"'.format('\",\"'.join(row))
+			string += '\"{!s}\"'.format('\",\"'.join(row))
 		self._set_shape(rows, rows[0])
 		if self._get_header(string) == True:
 			self._set_custom_header(rows[0])
@@ -154,7 +147,7 @@ class sql_table():
 		return self.dataframe
 
 	def _get_formatted_pair(self, key, value):
-		return ', {0} {1}'.format(
+		return ', {!s} {!s}'.format(
 			str(key),
 			str(value))
 
@@ -166,21 +159,21 @@ class sql_table():
 		return formatted
 
 	def _get_create_script(self):
-		return 'CREATE TABLE {0} (id INT{1});'.format(
+		return 'CREATE TABLE {!s} (id INT{!s});'.format(
 			self._get_table_name(),
 			self._get_formatted_variables())
 
 	def _get_variable_list(self):
-		return '({0})'.format(
+		return '({!s})'.format(
 			', '.join(self._get_variables()))
 
 	def _get_value_list(self, row):
-		return '(\"{0}\")'.format(
+		return '(\"{!s}\")'.format(
 			'\", \"'.join(row))
 
 	def _generate_insert_script(self):
 		for row in self._get_dataframe():
-			yield 'INSERT INTO {0} {1} VALUES {2};'.format(
+			yield 'INSERT INTO {!s} {!s} VALUES {!s};'.format(
 				self._get_table_name(),
 				self._get_variable_list(),
 				self._get_value_list(row))
@@ -200,9 +193,9 @@ class sql_table():
 		model.save()
 
 	def _get_sql_string(self):
-		sql_string = '{0}\n'.format(self._get_create_script())
+		sql_string = '{!s}\n'.format(self._get_create_script())
 		for script in self._generate_insert_script():
-			sql_string += '{0}\n'.format(script)
+			sql_string += '{!s}\n'.format(script)
 		return sql_string
 
 	'''
@@ -245,17 +238,26 @@ class sql_table():
 	def _escape_string(self, string):
 		return escape_string(string)
 
-	def _clean_column_name(self, string):
+	def _sanitize_column_name(self, string):
 		return self._escape_string(
 			self._replace_spaces(
 			self._truncate_string(string, 128)))
 
-	def _clean_datatype(self, string):
-		# Coming soon
-		return string
+	def _sanitize_datatype(self, string):
+		return self._escape_string(
+			self._replace_spaces(
+				string))
+
+	def _sanitize_datapoint(self, string):
+		return self._escape_string(string)
+
+	def _sanitize_row(self, rowlist):
+		return [[self._sanitize_datapoint(
+			datapoint) for datapoint in row] 
+			for row in rowlist]
 
 	'''
-	def clean_data(self, string, datatype, dtparams):
+	def check_data(self, string, datatype, dtparams):
 		pass
 
 	def validate_column_name(self, string):
