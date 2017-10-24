@@ -125,10 +125,9 @@ class sql_table():
 	def _set_dataframe(self, csv_file):
 		csv_file.open()
 		data = csv_file
-		rows = list(self._get_rows(data))
-		string = ''
-		for row in rows[:5]:
-			string += '\"{!s}\"'.format('\",\"'.join(row))
+		rows = self._sanitize_row(list(self._get_rows(data)))
+		string = ''.join(
+			['\"{!s}\"'.format('\",\"'.join(row)) for row in rows[:5]])
 		self._set_shape(rows, rows[0])
 		if self._get_header(string) == True:
 			self._set_custom_header(rows[0])
