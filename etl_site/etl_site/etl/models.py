@@ -39,13 +39,14 @@ class Table(models.Model):
 		upload_to='static/documents/raw/{0}/'.format(uuid.uuid4()))
 	sql_file = models.FileField(upload_to=sql_attachment_path)
 
-	variables = []
+	variables = None
 	default_header = None
 	shape = None
 	dataframe = None
 	head = None
 
 	def get_id(self):
+		'''Returns ID'''
 		return self.id
 
 	def instantiate_table(self):
@@ -70,6 +71,7 @@ class Table(models.Model):
 		self._set_sql_file()
 
 	def get_sql_file(self):
+		'''Retruns path to generated SQL file'''
 		return '/{0}'.format(self.sql_file.name)
 
 	def _set_head(self):
